@@ -2,44 +2,28 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
-class User extends Authenticatable
+
+
+class User extends Model implements AuthenticatableContract
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, Authenticatable;
+    
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $connection = 'qtec_task';
+    protected $table = 'tbl_users';
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-    ];
+    // public function validateCredentials($user, array $credentials)
+    // {
+    //     return password_verify($credentials['password'], $user->getAuthPassword());
+    // }
+    public function validateCredentials($user, array $credentials)
+    {
+        return Hash::check($credentials['password'], $user->getAuthPassword());
+    }
 }
